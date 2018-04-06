@@ -1,0 +1,30 @@
+.normal {
+    padding:0 20px;
+}
+.textRihght{
+text-align: right;
+}
+.label{
+color: rgba(0, 0, 0, 0.85);
+font-size: 12px;
+
+}
+
+.addButton {
+margin-bottom:10px !important;
+}
+
+.userLastName{
+	display: inline-flex;
+	margin-left: 7px !important;
+	width: 185px;
+	:global(.ant-form-item-label){
+		margin-right: 4px;
+	}
+	:global(.ant-form-item-control-wrapper){
+		margin-left: 6px;
+	}
+}
+.userFirstName{
+	width: 106px
+}

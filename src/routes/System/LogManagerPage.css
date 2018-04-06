@@ -1,0 +1,8 @@
+.ant-pagination-item{
+	max-width: 50px;
+	display: inline-block;
+}
+.searchInput,
+:global(.log-select-date input){
+	margin:0 !important;
+}

@@ -1,0 +1,21 @@
+@import "~antd/lib/style/themes/default.less";
+
+.stationTable {
+  :global {
+    .ant-table-pagination {
+      margin-top: 24px;
+    }
+  }
+
+  .tableAlert {
+    margin-bottom: 16px;
+  }
+
+    :global(.ant-table-thead > tr > th, .ant-table-tbody > tr > td){
+      text-align: left;
+
+  }
+  :global(tr.ant-table-expanded-row){
+    background: #f4f7f8;
+  }
+}

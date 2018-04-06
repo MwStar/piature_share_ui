@@ -1,0 +1,88 @@
+
+.year{
+	position: absolute;
+	width: 229px;
+	height: 282px;
+	background-color: #fff;
+    box-shadow: 0 1px 6px rgba(0,0,0,.2);
+    border-radius: 4px;
+    box-sizing: border-box;
+    z-index: 1050; 
+}
+.header a:first-child{
+	padding-left: 4px;
+}
+.header a:first-child:after{
+	content: "\AB";
+}
+.header a{
+	color: #595959;
+}
+.header a:nth-child(2){
+	margin: 0 66px;
+	font-weight: bold;
+}
+.header a:last-child:after{
+	content: "\BB";
+}
+.header a:hover{
+	color: #6DB0F2;
+}
+.body ul{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    font-size: 13px;
+    text-align: center;
+  }
+.body ul li{
+	float: left;
+	width: 76px;
+	height: 64px;
+	a{
+		padding: 6px;
+		color: #595959;
+		border-radius: 2px;
+	}
+	a:hover{
+		background-color: #ECF6FD;
+		color: #6DB0F2;
+	}
+}
+.body .prev a,.body .next a{
+	color: rgba(0,0,0,.25);
+}
+.body .prev a:hover,.body .next a:hover{
+	color: rgba(0,0,0,.25);
+}
+.clear{
+    z-index: 1;
+    position: absolute;
+    right: 12px;
+    background: #fff;
+    top: 50%;
+    font-size: 12px;
+    color: rgba(0,0,0,.25);
+    width: 14px;
+    height: 14px;
+    margin-top: -7px;
+    line-height: 14px;
+    cursor: pointer;
+    -webkit-transition: color .3s,opacity .3s;
+    transition: color .3s,opacity .3s;
+    display: inline-block;
+    font-style: normal;
+    vertical-align: baseline;
+    text-align: center;
+    text-transform: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+.clear:before{
+	content: "\E62E";
+	display: block;
+    font-family: anticon!important;
+}
+.clear:hover{
+	color: rgba(0,0,0,.5);
+}

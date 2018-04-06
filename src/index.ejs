@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>禾迈</title>
+  <link rel="icon" href="./favicon.png" type="image/x-icon">
+  <link rel="stylesheet" type="text/css" href="../iconfont/iconfont.css"/>
+
+</head>
+<body>
+  <div id="root"></div>
+  <span id="keleyivisitorip"></span>
+  <!-- <script src="./Regression.js"></script>
+  <script src="./g2-cloud.js"></script>
+  <script src="./slider.js"></script> -->
+  <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=19cacba68756210399cfed0012e65e05&plugin=AMap.Autocomplete,AMap.PlaceSearch,AMap.Geocoder"></script>
+<script src="http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js"></script>
+  <!--<script src="https://d3js.org/d3.v4.min.js"></script>-->
+<script type="text/javascript">
+ function getLocalStorage(key) {
+    try {
+      return JSON.parse(localStorage[key]);
+    } catch (err) { return null; }
+  }
+ var language = getLocalStorage("language");
+ if(!language){
+   language = "zh-cn";
+ }
+ localStorage["country"] = JSON.stringify(remote_ip_info.country);
+ console.log("remote_ip_info.country:",remote_ip_info.country);
+if(remote_ip_info.country ==="中国"){
+	document.write('\<script src="http:\/\/maps.google.cn\/maps\/api\/js?v=3.20&region=cn&language='+language+'&key=AIzaSyBzE9xAESye6Kde-3hT-6B90nfwUkcS8Yw&sensor=false&libraries=geometry,drawing,places" type="text/javascript" charset="utf-8" async defer><\/script>')
+}else{
+
+	document.write('\<script src="https\:\/\/maps.googleapis.com\/maps\/api\/js?key=AIzaSyAEMTETU5hLZv8kp8vHwD7W3Y_S8Jhoe04&v=3.exp&language='+language+'libraries=geometry,drawing,places" type="text/javascript" charset="utf-8" async defer><\/script>')
+}
+
+
+</script>
+</body>
+</html>

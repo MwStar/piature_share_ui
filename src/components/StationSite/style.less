@@ -1,0 +1,223 @@
+.transferBox{
+	text-align: center;
+}
+:global(.ant-transfer-list-header){
+	text-align:left;
+}
+
+.editable-cell {
+  position: relative;
+  // width:70%;
+}
+
+.editable-cell-input-wrapper,
+.editable-cell-text-wrapper {
+  padding-right: 24px;
+  // width:100%
+}
+
+.editable-cell-text-wrapper {
+  padding: 5px 24px 5px 5px;
+}
+
+.editable-cell-icon{
+  position: absolute;
+  right: 0;
+  width: 20px;
+  cursor: pointer;
+}
+.editable-cell-icon-check {
+  position: absolute;
+  right: 23px;
+  width: 20px;
+  cursor: pointer;
+}
+.editable-cell-icon-close {
+  position: absolute;
+  right: 0;
+  width: 20px;
+  cursor: pointer;
+}
+.editable-cell-icon {
+  line-height: 18px;
+  display: none;
+}
+
+.editable-cell-icon-check,.editable-cell-icon-close {
+  line-height: 28px;
+}
+
+.editable-cell:hover .editable-cell-icon {
+  display: inline-block;
+}
+
+.editable-cell-icon:hover,
+.editable-cell-icon-check:hover {
+  color: #108ee9;
+}
+
+.editable-add-btn {
+  margin-bottom: 8px;
+}
+@import "~antd/lib/style/themes/default.less";
+
+.stepForm {
+  margin: 40px auto 0;
+  max-width: 750px;
+}
+
+.stepFormText {
+  margin-bottom: 24px;
+  :global {
+    .ant-form-item-label,
+    .ant-form-item-control {
+      line-height: 22px;
+    }
+  }
+}
+
+.result {
+  margin: 0 auto;
+  max-width: 560px;
+  padding: 24px 0 8px;
+}
+
+.desc {
+  padding: 0 56px;
+  color: @text-color-secondary;
+  h3 {
+    font-size: 16px;
+    margin: 0 0 12px 0;
+    color: @text-color-secondary;
+    line-height: 32px;
+  }
+  h4 {
+    margin: 0 0 4px 0;
+    color: @text-color-secondary;
+    font-size: 14px;
+    line-height: 22px;
+  }
+  p {
+    margin-top: 0;
+    margin-bottom: 12px;
+    line-height: 22px;
+  }
+}
+
+@media screen and (max-width: @screen-md) {
+  .desc {
+    padding: 0;
+  }
+}
+
+.information {
+  line-height: 22px;
+  :global {
+    .ant-row:not(:last-child) {
+      margin-bottom: 24px;
+    }
+  }
+  .label {
+    color: @heading-color;
+    text-align: right;
+    padding-right: 8px;
+  }
+}
+
+.money {
+  font-family: Helvetica Neue;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 14px;
+}
+
+.uppercase {
+  font-size: 12px;
+}
+.wrapper{
+  margin-top:30px;
+}
+.previewImg{
+
+  height:160px;
+  width:100%;
+  text-align:center;
+  img{
+    height:160px;
+  }
+}
+
+:global(.ant-advanced-search-form) {
+  margin-top:30px;
+  // padding: 24px;
+  // background: #fbfbfb;
+  // // border: 1px solid #d9d9d9;
+  // border-radius: 6px;
+}
+
+:global(.ant-advanced-search-form .ant-form-item ){
+  display: flex;
+}
+
+:global(.ant-advanced-search-form .ant-form-item-label) {
+  overflow: visible;
+}
+.tips{
+  font-size:13px;
+}
+:global(.ant-advanced-search-form .ant-card-body ){
+  max-width:650px;
+  margin: 10px auto 0;
+}
+.equickBox{
+  background:#f2f2f2;
+  padding:20px;
+  border:1px solid #ddd;
+  border-radius:4px;
+  height:400px;
+  overflow-y: auto;
+  :global(.ant-tree ){
+    position: relative;
+  }
+}
+.layoutWrap{
+  border:1px solid #ddd;
+  border-radius:4px;
+  background: #ffffff;
+  height:400px;
+  overflow-y: auto;
+}
+.avatar-uploader > .ant-upload {
+  width: 128px;
+  height: 128px;
+}
+.treeIconBtn{
+  position: absolute;
+  right:-30px;
+  top:0;
+}
+.stationType{
+  margin-top:40px;
+
+}
+.stationBtn{
+  text-align: center;
+
+}
+.tempStyle{
+  text-align: right;
+}
+.relationBtn{
+  text-align: center;
+}
+:global(.layout-btn){
+  position: absolute;
+  padding:10px 20px 10px 20px ;
+  width:97%;
+  background-color: #fff;
+  font-size: 13px;
+  a,button{
+    font-size: 13px;
+  }
+
+}
