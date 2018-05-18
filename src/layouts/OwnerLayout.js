@@ -49,12 +49,24 @@ class OwnerLayout extends React.PureComponent {
   getPageTitle() {
     const { routerData, location } = this.props;
     const { pathname } = location;
-    let title = 'Hoymiles';
+    let title = 'Colorful';
     if (routerData[pathname] && routerData[pathname].name) {
-      title = `${routerData[pathname].name} - hoymiles`;
+      title = `${routerData[pathname].name} - Colorful`;
     }
     return title;
   }
+
+  componentDidMount() {
+       const {dispatch} = this.props;
+       const token = getLocalStorage("Token");
+       if(token){
+        dispatch({type:"user/fetchCurrent"});
+        dispatch({type:"global/fetchNotices"});
+        dispatch({type:"focususer/getFocus"});
+        dispatch({type:"collectuser/getPictureCollect"});
+       }
+  }
+
   render() {
     const {
       currentUser, fetchingNotices, notices, routerData, match, location, dispatch,menuList
@@ -84,7 +96,7 @@ class OwnerLayout extends React.PureComponent {
                     )
                   )
                 }
-                <Redirect exact from="/" to="/user/login" />
+                <Redirect exact from="/" to="/owner/view" />
                 <Route render={NotFound} />
               </Switch>
             </div>

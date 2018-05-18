@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Row, Col, Card, Form, Input, Select, Icon, Button, Dropdown, Menu, InputNumber, DatePicker, Modal, message, Table, Popconfirm, TreeSelect } from 'antd';
+import { Row, Col, Card, Form, Input, Select, Icon, Button, Dropdown, Menu, InputNumber, DatePicker, Modal, message, Table, Popconfirm ,Divider} from 'antd';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import styles from './Users.less';
 import Edituser from '../../components/Addusermodal/edit';
@@ -27,7 +27,7 @@ const formItemLayout = {
 
 export default class Users extends React.Component {
   state = {
-    formValues: {},
+    
   };
 
 
@@ -43,9 +43,6 @@ export default class Users extends React.Component {
   handleFormReset = () => {
     const { form, dispatch } = this.props;
     form.resetFields();
-    this.setState({
-      formValues: {},
-    });
     dispatch({
       type: 'users/usersList',
       payload: {},
@@ -62,18 +59,10 @@ export default class Users extends React.Component {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
-      const values = {
-        organizationId:fieldsValue.organizationId?fieldsValue.organizationId:'',
-        officeId:fieldsValue.officeId?fieldsValue.officeId:'',
-        userName:fieldsValue.name?fieldsValue.name:'',
-        userFullName:fieldsValue.userFullName?fieldsValue.userFullName:'',
-        updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
+       const values = {
+        query:{...fieldsValue},
+        page:{pageNum:pageNum,pageSize:pageSize}
       };
-      values.pageNum = pageNum;
-      values.pageSize = pageSize;
-      this.setState({
-        formValues: values,
-      });
       dispatch({
         type: 'users/setFormValue',
         formValues: values,
@@ -86,12 +75,6 @@ export default class Users extends React.Component {
   }
 
 
-  // 归属公司改变联动归属部门
-   changeOigaization = (value) => {
-     const { dispatch } = this.props;
-     dispatch({ type: 'users/queryOffice', payload: { ids: value } });
-     // dispatch({type: 'users/saveOfficeId', payload: {officeId: null}});
-   }
 
   // 首行查询，导出，新增操作
    renderSimpleForm() {
@@ -100,45 +83,33 @@ export default class Users extends React.Component {
      const { page } = this.props.users;
 
      return (
-       <Form onSubmit={(e) => { e.stopPropagation(); this.handleSearch(1, page.pageSize); }} layout="inline" >
-         <FormItem label="归属经销商" style={{ width: 250 }}>
-           {getFieldDecorator('organizationId')(
+       <Form layout="inline" >
+         <FormItem label="用户类型" style={{ width: 250 }}>
+           {getFieldDecorator('userType')(
 
-             <TreeSelect
-              placeholder="请选择归属经销商"
-              onChange={this.changeOigaization}
-              treeData={users.organizationList}
-              treeDefaultExpandAll
-              dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-            />
+             <Select
+              placeholder="请选择用户类型"
+            >
+              <Option value="1">用户</Option>
+              <Option value="3">摄影师</Option>
+              <Option value="2">管理员</Option>
+            </Select>
 
               )}
          </FormItem>
-         <FormItem {...formItemLayout} label="归属部门" style={{ width: 220 }}>
-           {getFieldDecorator('officeId', {
 
-                })(
-                  <TreeSelect placeholder="请选择归属部门"
-                        treeData={users.officeList}
-                        treeDefaultExpandAll
-                        dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                        >
-                  </TreeSelect>
-                  )}
-         </FormItem>
          <FormItem label="用户名" style={{ width: 160 }}>
+           {getFieldDecorator('loginname')(
+             <Input placeholder="请输入" />
+              )}
+         </FormItem>
+         <FormItem label="昵称" style={{ width: 160 }}>
            {getFieldDecorator('name')(
              <Input placeholder="请输入" />
               )}
          </FormItem>
-         <FormItem label="姓名" style={{ width: 160 }}>
-           {getFieldDecorator('userFullName')(
-             <Input placeholder="请输入" />
-              )}
-         </FormItem>
          <FormItem className={styles.submitButtons}>
-           <Button type="primary" htmlType="submit">查询</Button>
-           {/* <Button type="primary" style={{ marginLeft: 8 }} onClick={this.handleFormReset}>导出</Button> */}
+           <Button type="primary" onClick={()=>{this.handleSearch(1, page.pageSize); }}>查询</Button>
            <Button type="primary" style={{ marginLeft: 8 }} onClick={this.addUser}>新增</Button>
          </FormItem>
        </Form>
@@ -148,19 +119,20 @@ export default class Users extends React.Component {
 
   handlePageChange = (pageNum, pageSize) => {
     const { dispatch } = this.props;
-    dispatch({ type: 'users/setPage', page: { pageSize, pageNum } });
-    // const { users: { pagination } } = this.props;
+    const { page } = this.props.users;
+    dispatch({ type: 'users/setPage', page: { pageSize,total:page.total, pageNum } });
     this.handleSearch(pageNum, pageSize);
   };
 
   // 删除用户
   deleteUser = (id) => {
     const { dispatch } = this.props;
+    const { formValues } = this.props.users;
     dispatch({ type: 'users/daleteUser', payload: { ids: id } });
     // 重新查询数据
     dispatch({
       type: 'users/usersList',
-      payload: this.state.formValues,
+      payload: formValues,
     });
   }
 
@@ -169,22 +141,24 @@ export default class Users extends React.Component {
     const { dispatch } = this.props;
     dispatch({ type: 'users/userListSuccess', payload: {} });
     dispatch({ type: 'users/editmodalStatus', editmodal: true });
-    // dispatch({type:'users/modalStatus',modal:true});
   }
 
   // 修改用户
   updateUser = (record) => {
     const { dispatch } = this.props;
     const { users: { checkRolesList } } = this.props;
-
-    let arr = [];
-    if (record.roleIds && record.roleIds.length > 0) {
-      arr = record.roleIds.split(',');
-    }
-    // state中设置checkcheckRolesList
-    dispatch({ type: 'users/savecheckRolesList', checkRolesList: arr });
     dispatch({ type: 'users/userListSuccess', payload: record });
     dispatch({ type: 'users/editmodalStatus', editmodal: true });
+  }
+
+  //重置密码
+  resetPassword = (record) => {
+    const {dispatch} = this.props;
+    const params = {
+      id: record.id,
+      userPwd : record.userPwd,
+    }
+    dispatch({type:'users/resetPass',payload:params});
   }
 
   showTotal = (total, range) => {
@@ -194,31 +168,44 @@ export default class Users extends React.Component {
 
   handleSizeChange = (current, size) => {
     const { dispatch } = this.props;
-    dispatch({ type: 'users/setPage', page: { pageSize: size, pageNum: current } });
+    const { page } = this.props.users;
+    dispatch({ type: 'users/setPage', page: { pageSize: size,total:page.total, pageNum: current } });
     this.handleSearch(current, size);
   }
 
   render() {
-    const { users: { loading: usersLoading, list, pagination, userList } } = this.props;
+    const { users: { loading, list, page, userList ,formValues} } = this.props;
     const { getFieldDecorator } = this.props.form;
     const columns = [
       {
-        title: '归属经销商',
-        dataIndex: 'companyName',
-        key: 'companyName',
+        title: '用户登录名',
+        dataIndex: 'loginname',
+        key: 'loginname',
       },
       {
-        title: '归属部门',
-        dataIndex: 'officeName',
-        key: 'officeName',
-      },
-      {
-        title: '用户名',
-        dataIndex: 'userName',
+        title: '用户类型',
+        dataIndex: 'userType',
+        key: 'userType',
+        render:(text,record)=>{
+          if(text === '1'){return(<span>普通用户</span>)}
+            else if(text === '2'){return(<span>管理员</span>)}
+              else{return(<span>摄影师</span>)}
+        }
       },
       {
         title: '姓名',
-        dataIndex: 'userFullName',
+        dataIndex: 'name',
+        key: 'name',
+      },
+      {
+        title: '邮箱',
+        dataIndex: 'email',
+        key: 'email',
+      },
+      {
+        title: '原创图片',
+        dataIndex: 'img_count',
+        key: 'img_count',
       },
       {
         title: '操作',
@@ -226,9 +213,11 @@ export default class Users extends React.Component {
         render: (record) => {
           return (
             <span>
-              <Popconfirm placement="top" title="您是否要删除？" onConfirm={() => { this.deleteUser(record.id); }} okText="是" cancelText="否"><a href="javascript:void(0)">删除</a></Popconfirm>
-              <span className="ant-divider" />
               <a href="javascript:void(0)" onClick={() => { this.updateUser(record); }}>修改</a>
+              <Divider type="vertical" />
+              <Popconfirm placement="top" title="您是否要删除？" onConfirm={() => { this.deleteUser(record._id); }} okText="是" cancelText="否"><a href="javascript:void(0)">删除</a></Popconfirm>
+              <Divider type="vertical" />
+              <Popconfirm placement="top" title="您是否要重置密码？" onConfirm={() => { this.resetPassword(record); }} okText="是" cancelText="否"><a href="javascript:void(0)">重置密码</a></Popconfirm>
             </span>
           );
         },
@@ -244,14 +233,15 @@ export default class Users extends React.Component {
               {this.renderSimpleForm()}
             </div>
             <Table
+              loading={loading}
               dataSource={list}
               columns={columns}
               bordered
               className={styles.content}
               pagination={{
-              total: pagination.total,
-              current: pagination.pageNum,
-              pageSize: pagination.pageSize,
+              total: page.total,
+              current: page.pageNum,
+              pageSize: page.pageSize,
               showSizeChanger: true,
               onShowSizeChange: this.handleSizeChange,
               pageSizeOptions: ['10', '20', '50'],
@@ -261,7 +251,7 @@ export default class Users extends React.Component {
               }}
             />
           </div>
-          <Edituser user={userList} formValues={this.state.formValues} />
+          <Edituser user={userList} formValues={formValues} />
 
         </Card>
       </PageHeaderLayout>

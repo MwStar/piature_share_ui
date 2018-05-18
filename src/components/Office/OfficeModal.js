@@ -116,7 +116,6 @@ getOffice=(id) => {
 
  //上传图片
  handleChange = ({ file,fileList }) => {
-  console.log("fileList-----"+fileList);
   this.setState({ fileList });
   if(file.status === 'done'){
   this.setState({ logoPath: file.response.data.filePath,temp:true})

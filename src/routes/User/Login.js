@@ -86,12 +86,12 @@ export default class Login extends Component {
     const { count, type } = this.state;
     return (
       <div className={styles.main}>
-      <div className={styles.language}>
+      {/*<div className={styles.language}>
         <Breadcrumb separator="|">
           <Breadcrumb.Item><a onClick={()=>{this.handleLanguage("zh-cn")}}>中文</a></Breadcrumb.Item>
           <Breadcrumb.Item><a onClick={()=>{this.handleLanguage("en-us")}}>English</a></Breadcrumb.Item>
         </Breadcrumb>
-      </div>
+      </div>*/}
         <Form onSubmit={this.handleSubmit} style={{paddingTop:'70px'}}>
 
               <FormItem>
@@ -133,6 +133,9 @@ export default class Login extends Component {
             <Button size="large" loading={login.submitting} className={styles.submit} type="primary" htmlType="submit">
               登录
             </Button>
+            <Link className={styles.register} to="/user/register">
+              去注册
+            </Link>
           </FormItem>
         </Form>
 

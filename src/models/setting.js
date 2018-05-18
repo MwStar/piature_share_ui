@@ -1,6 +1,6 @@
 import {message} from 'antd';
 import { routerRedux } from 'dva/router';
-import { setting ,userInfo} from '../services/user';
+import { setting ,userInfo, rePassword} from '../services/user';
 import { getLocalStorage} from '../utils/utils';
 export default {
   namespace: 'setting',
@@ -25,28 +25,39 @@ export default {
         payload: false,
       });
     },
+    //修改信息
     *setting({payload}, { call, put ,select}) {
       const key = yield select(state => state.setting.key);
-      const owner = yield select(state => state.login.owner);
+      const userType = getLocalStorage('userType');
       const response = yield call(setting,payload);
-      if(response.status==="0"){
-      	if(key===1){
-	      	message.success("修改用户信息成功");
-          if(owner){yield put(routerRedux.push('/owner/view'));}
-          else{yield put(routerRedux.push('/station/list'));}
-	      	yield put({type: 'user/fetchCurrent'});
-	    }
-      	else{
+      if(response.status === 0){
+          message.success("修改用户信息成功");
+          if(userType === "1"){yield put(routerRedux.push('/owner/paintings'));}
+          else{yield put(routerRedux.push('/statistics'));}
+          yield put({type: 'user/fetchCurrent'});
+      }
+      else{
+        message.error(response.message);
+      }
+    },
+
+    //修改密码
+    *settingPass({payload}, { call, put ,select}) {
+      const key = yield select(state => state.setting.key);
+      const userType = getLocalStorage('userType');
+      const response = yield call(rePassword,payload);
+      if(response.status === 0){
       		message.success("修改密码成功");
       		yield put(routerRedux.push('/user/login'));
           yield put({type: 'user/isVisible',visible:false});
-      	}
       	
       }
       else{
       	message.error(response.message);
       }
     },
+
+
     
   },
 

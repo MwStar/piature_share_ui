@@ -92,31 +92,6 @@ function getNode(json, arr, nodeId) {
 
 
 /**
-   * 机构数据组装selectTree数据
-   * @param datajsons
-   * @param rejson
-   * @param pid
-   * @returns {*}
-   */
-export function setOfficeSelectTree(datajsons, rejson, pid) {
-  const len = datajsons.length;
-  for (let i = 0; i < len; i++) {
-    const json = datajsons[i];
-    const newJson = {};
-    if (json.parentId == pid) {
-      newJson.key = json.id;
-      newJson.value = json.id;
-      newJson.label = json.name;
-      newJson.type = json.type;
-      rejson.push(newJson);
-      const data = setOfficeSelectTree(datajsons, [], json.id);
-      if (data.length > 0) {
-        newJson.children = data;
-      }
-    }
-  }
-  return rejson;
-}/**
    * 菜单数据组装Tree数据
    * @param datajsons
    * @param rejson
@@ -142,101 +117,7 @@ export function setMenuTree(datajsons, rejson, pid) {
   }
   return rejson;
 }
-/**
-   * 设备关系数据
-   * @param datajsons
-   * @param rejson
-   * @param pid
-   * @returns {*}
-   */
-export function setDeviceTree(datajsons, rejson, pid) {
-  const len = datajsons.length;
-  for (let i = 0; i < len; i++) {
-    const json = datajsons[i];
-    const newJson = {};
-    if (json.pid == pid) {
-      newJson.key = json.id;
-      newJson.value = `${json.id}`;
-      newJson.name = json.sn;
-      if (json.type == 2) { // 中继器
-        newJson.dtuId = json.pid;
-        newJson.dtuSn = datajsons.find(item => item.id === json.pid).sn;
-      } else if (json.type == 1) { // 微逆
-        const obj = datajsons.find(item => item.id === json.pid);
 
-        if (obj.type === 3) { // DTU
-          newJson.dtuId = obj.id;
-          newJson.dtuSn = obj.sn;
-        } else if (obj.type === 2) { // 中继器
-          const dtuObj = datajsons.find(item => item.id === obj.pid);
-          newJson.dtuId = dtuObj.id;
-          newJson.dtuSn = dtuObj.sn;
-          newJson.reapterId = obj.id;
-          newJson.reapterSn = obj.sn;
-        }
-      }
-      newJson.type = json.type;
-
-      const data = setDeviceTree(datajsons, [], json.id);
-      if (data.length > 0) {
-        newJson.children = data;
-      }
-
-      rejson.push(newJson);
-    }
-  }
-
-  return rejson;
-}
-export function getIds(datajsons) {
-  const len = datajsons.length;
-  const arr = [];
-  for (let i = 0; i < len; i++) {
-    const json = datajsons[i];
-    if (json.type == 2 || json.type == 3) {
-      arr.push(`${json.id}`);
-    }
-  }
-  return arr;
-}
-/**
-   * 经销商数据组装selectTree数据
-   * @param datajsons
-   * @param rejson
-   * @param pid
-   * @returns {*}
-   */
-export function setAgencySelectTree(datajsons, rejson, pid) {
-  const len = datajsons.length;
-  for (let i = 0; i < len; i++) {
-    const json = datajsons[i];
-
-    const newJson = {};
-    if (json.parentId == pid) {
-      newJson.key = json.id;
-      newJson.value = `${json.id}`;
-      newJson.label = json.name;
-      if (json.type == '0') {
-        rejson.push(newJson);
-      }
-      const data = setAgencySelectTree(datajsons, [], json.id);
-      if (data.length > 0) {
-        newJson.children = data;
-      }
-    }
-  }
-  return rejson;
-}
-/** 根据经销商id 获取相应的业主信息* */
-export function getOwnerByAgencyId(data, id) {
-  const arr = [];
-  data.map((item) => {
-    if (item.parentId == id && item.type == '2') {
-      arr.push(item);
-    }
-  });
-  return arr;
-}
 
 export function fixedZero(val) {
   return val * 1 < 10 ? `0${val}` : val;

@@ -2,9 +2,11 @@
  import React, { Component } from 'react';
  import { Input,Row,Col, Icon, message,Button,Card,Form,Tabs,Menu,Layout} from 'antd';
  import {connect} from 'dva';
+ import {routerRedux} from 'dva/router';
  import PageHeaderLayout from '../../layouts/PageHeaderLayout';
- import styles from './Paintings.less';
+ import styles from './Picture.less';
  import PictureCard from '../../components/PaintingCard/PictureCard.js';
+ import ViewPicture from '../../components/ViewPictureModal/index';
  import Masonry from 'react-masonry-component';
 
 var masonryOptions = {
@@ -19,27 +21,53 @@ var masonryOptions = {
 
 
  @connect(state => ({
-  setting: state.setting,
+  paintingsuser: state.paintingsuser,
+  pictures:state.pictures,
 }))
  @Form.create()
 
  export default class  Pictures extends Component {
+    state = {
+    data:{},//一张图片的信息
+  }
+  componentDidMount() {
+       const {dispatch} = this.props;
+       const id = this.props.match.params.id;
+       dispatch({type:"paintingsuser/findPaintingById",payload: {id:id}});
+  }
 
+  //查看图片信息
+  /*data---图片信息
+  */
+  pictureClick = (item) => {
+    const { dispatch } = this.props;
+    dispatch({type:'pictures/viewPicture',payload:{id:item._id}})
+    .then(()=>{    
+    dispatch({type:'pictures/modalStatus',modal:true});
+    })
+  }
+
+  //上传图片
+  add = () => {
+    const { dispatch } = this.props;
+    dispatch(routerRedux.push('/owner/upload'));
+  }
+
+  //返回
+  back = () => {
+    /*const { history } = this.props;
+    history.go(-1);*/
+    const { dispatch } = this.props;
+    dispatch(routerRedux.push('/owner/paintings'));
+  }
 
   render() {
-   	const list = [
-    {"id":1,"title":"feddddd","path":"https://images.pexels.com/photos/191076/pexels-photo-191076.jpeg?h=350&auto=compress&cs=tinysrgb 1x"},
-    {"id":2,"title":"feddddd","path":"https://images.pexels.com/photos/191076/pexels-photo-191076.jpeg?h=350&auto=compress&cs=tinysrgb 1x"},
-    {"id":3,"title":"feddddd","path":"https://images.pexels.com/photos/191076/pexels-photo-191076.jpeg?h=350&auto=compress&cs=tinysrgb 1x"},
-    {"id":4,"title":"feddddd","path":"https://images.pexels.com/photos/191076/pexels-photo-191076.jpeg?h=350&auto=compress&cs=tinysrgb 1x"},
-    {"id":5,"title":"feddddd","cover_path":"https://images.pexels.com/photos/189536/pexels-photo-189536.jpeg?h=350&auto=compress&cs=tinysrgb 1x"},
-    {"id":6,"title":"feddddd","cover_path":"https://images.pexels.com/photos/189536/pexels-photo-189536.jpeg?h=350&auto=compress&cs=tinysrgb 1x"},
-    {"id":7,"title":"feddddd","cover_path":"https://images.pexels.com/photos/189536/pexels-photo-189536.jpeg?h=350&auto=compress&cs=tinysrgb 1x"},
-    {"id":8,"title":"feddddd","path":"https://images.pexels.com/photos/191076/pexels-photo-191076.jpeg?h=350&auto=compress&cs=tinysrgb 1x"},
-    {"id":9,"title":"feddddd","cover_path":"https://images.pexels.com/photos/189536/pexels-photo-189536.jpeg?h=350&auto=compress&cs=tinysrgb 1x"},
-   	];
+    const { pictureList } = this.props.paintingsuser;
+    const id = this.props.match.params.id;
+    const { picture } = this.props.pictures;
     return (
       <div className={styles.pictures}>
+      <div onClick={this.back} className={styles.back}>返回画集</div>
       	<Masonry
             className={ styles.my_gallery} // default ''
             elementType={'div'} // default 'div'
@@ -47,20 +75,25 @@ var masonryOptions = {
             disableImagesLoaded={false} // default false
             updateOnEachImageLoad={false} // default false and works only if disableImagesLoaded is false
         >
-          <Row gutter={16}>
-            
+        <div className={styles.add}>
+          <a onClick={this.add}>
+          <i className="iconfont icon-add"></i>
+          <p>上传图片</p>
+          </a>
+        </div>
+          
               {
-                list.map((item)=>{
+                pictureList.map((item)=>{
                 return (
-                  <Col xs={12} sm={8} md={6} lg={6} xl={6} style={{"paddingBottom":"20px"}}>
-                    <PictureCard data={item}></PictureCard>
-                  </Col>
+                  <div style={{"width":"25%","padding":"10px"}} onClick={()=>{this.pictureClick(item)}}>
+                    <PictureCard data={item} id={id} match={this.props.match}></PictureCard>
+                  </div>
                   )
                 })
               }
-            
-          </Row>
+                    
         </Masonry>
+        <ViewPicture picture={picture}></ViewPicture>
       </div>
     );
   }

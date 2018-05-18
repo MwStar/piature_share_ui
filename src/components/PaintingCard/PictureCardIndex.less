@@ -10,17 +10,64 @@
 	    right: 6px;
 	    left: 6px;
 	}
+	.actionscenter{
+		display: block;
+		position: absolute;
+	    z-index: 4;
+	    top: 50%;
+	    left: 43%;
+	}
 	img{
 		width: 100%;
+		cursor: url('../../assets/magnifier.cur'), auto;
 	}
 	.right{
 		position: absolute;
 		top: 0;
     	right: 0;
+    	cursor: pointer;
+	}
+	.righttwo{
+		position: absolute;
+		top: 0;
+    	right: 0;
+    	cursor: pointer;
 	}
 	.left{
 		position: absolute;
 		top: 0;
     	left: 0;
+	}
+	.actionsdown{
+		display: block;
+		position: absolute;
+	    z-index: 3;
+	    bottom: 33px;
+	    right: 6px;
+	    left: 6px;
+	    .right i{
+	    	font-size: 22px;
+	    	color: #fff;
+	    }
+	    .right i:hover{
+	    	color: #515151;
+	    };
+	    .left .name{
+	    	vertical-align: middle;
+	    }
+	}
+	.collect{
+		font-size: 22px;
+		color: #fff;
+	}
+	.collect:hover{
+		color: #EE4D59;
+	}
+	decollect{
+		color: #EE4D59;
+	}
+	:global(.icon-download2){
+		color: #555555;
+		font-size: 22px;
 	}
 }

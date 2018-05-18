@@ -1,17 +1,21 @@
 
- import React, { Component } from 'react';
- import { Input,Row,Col, Icon, message,Button,Card,Form,Tabs,Menu,Layout} from 'antd';
+import React, { Component } from 'react';
+import { Input,Row,Col, Icon, message,Button,Card,Form,Tabs,Menu,Layout} from 'antd';
 import { Route, Redirect, Switch } from 'dva/router';
- import {connect} from 'dva';
- import UserInfo from '../../components/UserInfo/index';
- import PageHeaderLayout from '../../layouts/PageHeaderLayout';
- import styles from './Paintings.less';
+import {connect} from 'dva';
+import {routerRedux} from 'dva/router';
+import UserInfo from '../../components/UserInfo/index';
+import UserInfoOther from '../../components/UserInfo/other';
+import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import styles from './User.less';
 import { getRoutes } from '../../utils/utils';
-import Paintings from './Paintings.js';
-import Collect from './Collect.js';
-import Focus from './Focus.js';
-import Setting from './Setting.js';
-
+import Paintings from './Paintings';
+import Gather from './Gather';
+import Collect from './Collect';
+import Focus from './Focus';
+import {setLocalStorage, getLocalStorage } from '../../utils/utils';
+const TabPane = Tabs.TabPane;
+const token = getLocalStorage("Token");
 /**
  *
  类说明：画集,收藏，关注，资料
@@ -19,12 +23,7 @@ import Setting from './Setting.js';
  @constructor
  */
 const { Content ,Sider ,Header} = Layout;
- const menu = [
-  	{name:'我的画集',path:'/owner/paintings',},
-  	{name:'我的收藏',path:'/owner/collect',},
-  	{name:'我的关注',path:'/owner/focus',},
-  	{name:'我的资料',path:'/owner/setting',},
-  	]
+
  @connect(state => ({
   setting: state.setting,
 }))
@@ -32,63 +31,55 @@ const { Content ,Sider ,Header} = Layout;
 
  export default class User extends Component {
 
- 	getCurrentStep() {
-    const { location: { pathname }} = this.props;
-    switch(pathname){
-    	case "/owner/paintings":return 0;break;
-    	case "/owner/collect":return 1;break;
-    	case "/owner/focus":return 2;break;
-    	case "/owner/setting":return 3;break;
-    }
-    
+
+/* componentWillMount() {
+       const {dispatch} = this.props;
+       const token = getLocalStorage("Token");
+       if(!token){
+          dispatch(routerRedux.push('/user/login'));
+       }
+  }*/
+
+//设置
+  setting = () => {
+    const { dispatch } = this.props;
+    dispatch(routerRedux.push('/owner/setting'));
   }
-  getCurrentComponent() {
-    const componentMap = {
-      0: Paintings,
-      1: Collect,
-      2: Focus,
-      3: Setting,
-    };
-    return componentMap[this.getCurrentStep()];
+
+
+
+  getSelectedMenuKeys = (path) => {
+    let arr = [];
+    arr.push(path);
+    return arr;
   }
 
   render() {
-  	const CurrentComponent = this.getCurrentComponent();
+  	//const CurrentComponent = this.getCurrentComponent();
     const { location: { pathname }} = this.props;
-
+    const token = getLocalStorage("Token");
   	
     return (
       <div className={styles.paintings}>
-      	<Row gutter={16}>
-      		<Col span={4}>
-		      	<UserInfo></UserInfo>      
-			      	<Menu
-			          theme="dark"
-			          mode="inline"
-			          selectedKeys={pathname}
-			          style={{ padding: '16px 0', width: '100%' ,borderRadius:'4px'}}
-			        >
-			          {
-			          	menu.map((item)=>{
-		          		return (
-		          			<Menu.Item key={item.path}>
-		          				<a href={`#${item.path}`}>
-				                  <span>{item.name}</span>
-				                </a>
-		          			</Menu.Item>
-		          			)
-			          	})
-			          }
-			        </Menu>
-		    </Col>
-	        <Col span={20}>
-		        <div style={{padding: 24, margin: 0, minHeight: 280 }}>
-		            <div style={{ minHeight: 'calc(100vh - 260px)' }}>
-		              <CurrentComponent/>
-		            </div>
-		        </div>
-	        </Col>
-		</Row>
+      {token?<div>
+              {pathname === "/owner/paintings"?
+                <div>
+                <span onClick={this.setting} className={styles.setting}>设置</span>  
+    		      	<UserInfo dispatch={this.props} location={this.props.location} match={this.props.match}></UserInfo>
+                </div>
+                :
+                <UserInfoOther dispatch={this.props} location={this.props.location} match={this.props.match}></UserInfoOther>
+              }
+              <Tabs defaultActiveKey="1">
+                <TabPane tab="画集" key="1"><Paintings location={this.props.location} match={this.props.match}></Paintings></TabPane>
+                {/*<TabPane tab="采集" key="2"><Gather location={this.props.location} match={this.props.match}></Gather></TabPane>*/}
+                <TabPane tab="喜欢" key="3"><Collect location={this.props.location} match={this.props.match}></Collect></TabPane>
+                <TabPane tab="关注" key="4"><Focus location={this.props.location} match={this.props.match}></Focus></TabPane>
+              </Tabs>
+   		 </div>:
+       <div className={styles.login}>
+          <h2>请先登录</h2>
+       </div>}
       </div>
     );
   }

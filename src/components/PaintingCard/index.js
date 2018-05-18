@@ -5,9 +5,10 @@ import styles from './index.less';
 import station_img from '../../assets/station_img.jpg';
 import {routerRedux} from 'dva/router';
 import EditPainging from'../EditPainting/index';
+import {config} from '../../utils/config';
 
 
-//一个画集
+//用户---一个画集
 
 class PaintingCard extends PureComponent {
   state = {
@@ -18,8 +19,8 @@ class PaintingCard extends PureComponent {
   edit = () => {
   	const {data} = this.props;
   	const {dispatch} = this.props;
-  	dispatch({ type: 'paintings/savePainting', painting: data });
-  	dispatch({ type: 'paintings/modalStatus', modal: true });
+  	dispatch({ type: 'paintingsuser/savePaintingInfo', payload: data });
+  	dispatch({ type: 'paintingsuser/modalStatus', modal: true });
   }
 
 
@@ -29,14 +30,15 @@ class PaintingCard extends PureComponent {
 	    	<div>	
 		      	<Card bordered={false} className={styles.stationCard}>
 			      <div className={styles.stationImg}>
-				    <a href={`#/owner/painting/${data.id}`}>
-				    	{data.cover_path?<img src={data.cover_path}/>:<img src={station_img}/>}
+				    <a href={`#/owner/painting/${data._id}`}>
+				    	{data.cover_path?<img src={config.CHRCK_FILE+data.cover_path}/>:<img src={station_img}/>}
 				    </a>
 			      </div>
 			      <h4>{data.title}</h4>
 			      <div><Button style={{"width":"100%"}} onClick={this.edit}>编辑</Button></div>
 			    </Card>
-			    <EditPainging painting={data}></EditPainging>
+
+			    
 		    </div>
 	    );
 	}

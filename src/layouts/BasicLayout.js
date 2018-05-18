@@ -11,6 +11,7 @@ import GlobalFooter from '../components/GlobalFooter';
 import SiderMenu from '../components/SiderMenu';
 import NotFound from '../routes/Exception/404';
 import { getRoutes } from '../utils/utils';
+import {setLocalStorage, getLocalStorage } from '../utils/utils';
 
 const { Content } = Layout;
 
@@ -35,6 +36,15 @@ const query = {
   },
 };
 
+const userType = getLocalStorage("userType");
+let rout = '';
+ if(userType === "2"){
+    rout = '/statistics';
+  }
+  else {
+    rout = '/owner/view';
+  }
+
 class BasicLayout extends React.PureComponent {
   static childContextTypes = {
     location: PropTypes.object,
@@ -50,12 +60,13 @@ class BasicLayout extends React.PureComponent {
   getPageTitle() {
     const { routerData, location } = this.props;
     const { pathname } = location;
-    let title = 'Hoymiles';
+    let title = 'Colorful';
     if (routerData[pathname] && routerData[pathname].name) {
-      title = `${routerData[pathname].name} - hoymiles`;
+      title = `${routerData[pathname].name} - Colorful`;
     }
     return title;
   }
+
   render() {
     const {
       currentUser, collapsed, fetchingNotices, notices, routerData, match, location, dispatch,menuList} 
@@ -91,7 +102,7 @@ class BasicLayout extends React.PureComponent {
                     )
                   )
                 }
-                <Redirect exact from="/" to="/user/login" />
+                <Redirect exact from="/" to={rout} />
                 <Route render={NotFound} />
               </Switch>
             </div>

@@ -10,7 +10,7 @@ export async function queryUsers(params) {
 }*/
 //分页查询用户列表
 export async function queryUsers(params) {
-  return request('/permission/api/0/permission/user/queryUsersPageByUserDtoForInnerPlatform',{
+  return request('/users',{
     method: 'POST',
     body: params,
   });
@@ -18,14 +18,14 @@ export async function queryUsers(params) {
 
 //删除用户
 export async function daleteUser(params) {
-  return request('/permission/api/0/permission/user/delete',{
-    method: 'POST',
-    body: params,
+  return request('/deleteUser',{
+    method: 'GET',
+    param:params.id,
   });
 }
 //更新用户
 export async function updateUser(params) {
-  return request('/permission/api/0/permission/user/update',{
+  return request('/updateUser',{
     method: 'POST',
     body: params,
   });
@@ -40,7 +40,15 @@ export async function getUser(params) {
 
 //增加用户
 export async function addtUser(params) {
-  return request('/permission/api/0/permission/user/create',{
+  return request('/addUser',{
+    method: 'POST',
+    body: params,
+  });
+}
+
+//重置密码
+export async function resetPass(params) {
+  return request('/resetPass',{
     method: 'POST',
     body: params,
   });
@@ -112,6 +120,21 @@ export function queryResources(){
 //获取所有服务项
 export function queryResources(params){  
  return request('/permission/api/0/permission/resource/queryAllResource', {
+  method: 'POST',
+  body: params,
+});
+}
+
+//获取统计数据
+export function queryCount(params){  
+ return request('/count', {
+  method: 'GET',
+});
+}
+
+//获取下载量，本周，本月，本年
+export function getDownload(params){  
+ return request('/downloadCount', {
   method: 'POST',
   body: params,
 });

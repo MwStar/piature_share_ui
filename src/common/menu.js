@@ -10,6 +10,9 @@ const menuData = [{
         name: '图片审核',
         path: 'verify',
     }, {
+        name: '图片标签',
+        path: 'tag',
+    }, {
         name: '图片管理',
         path: 'manage',
     }],
@@ -21,7 +24,7 @@ const menuData = [{
     children: [{
         name: '用户管理',
         path: 'user',
-    }, {
+    }/*, {
         name: '角色管理',
         path: 'role',
     }, {
@@ -30,7 +33,7 @@ const menuData = [{
     }, {
         name: '日志管理',
         path: 'log',
-    }],
+    }*/],
 }];
 
 function formatter(data, parentPath = '') {

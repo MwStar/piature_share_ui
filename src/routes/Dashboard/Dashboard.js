@@ -1,194 +1,120 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Row, Col, Icon, Card, Tabs, Table, Radio, DatePicker, Tooltip, Menu, Dropdown } from 'antd';
+import { Row, Col, Icon, Card, Tabs, Table, Radio, DatePicker, Tooltip, Menu, Dropdown ,Avatar} from 'antd';
 import numeral from 'numeral';
 import {
-  ChartCard, yuan, MiniArea, MiniBar, MiniProgress, Field, Bar, Pie, TimelineChart} from '../../components/Charts';
+  ChartCard, yuan, MiniBar, MiniProgress, Field, Bar, Pie, TimelineChart,MiniArea} from '../../components/Charts';
 import Trend from '../../components/Trend';
-import NumberInfo from '../../components/NumberInfo';
-import MapCluster from '../../components/MapCluster';
-import PowerStationTable from '../../components/PowerStationTable';
-import { getTimeDistance } from '../../utils/utils';
+import {config} from '../../utils/config';
+import MonthChart from './MonthChart';
 
 import styles from './Dashboard.less';
 
+
+Date.prototype.Format = function (fmt) {
+    var o = {
+        "M+": this.getMonth() + 1, //月份 
+        "d+": this.getDate(), //日 
+        "H+": this.getHours(), //小时 
+        "m+": this.getMinutes(), //分 
+        "s+": this.getSeconds(), //秒 
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+        "S": this.getMilliseconds() //毫秒 
+    };
+    if (/(y+)/.test(fmt)){
+        fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    }
+    for (var k in o){
+         if (new RegExp("(" + k + ")").test(fmt)){
+             fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));    
+         }
+    }
+    return fmt;
+}
 const { TabPane } = Tabs;
 const { RangePicker } = DatePicker;
+const topColResponsiveProps = {
+      xs: 24,
+      sm: 12,
+      md: 12,
+      lg: 12,
+      xl: 6,
+      style: { marginBottom: 10 },
+    };
 
-const rankingListData = [];
-for (let i = 0; i < 7; i += 1) {
-  rankingListData.push({
-    title: `电站 ${i} `,
-    total: 323234,
-  });
+const date = new Date();
+const currentYear = date.getFullYear();
+const currentDay = date.getDay();
+let ticksArray = [];
+for (let i = 0; i < 7; i++) {
+    ticksArray.push(new Date(date.getTime() + 24 * 60 * 60 * 1000 * (i - (currentDay + 6) % 7)).Format("yyyy-MM-dd"));
 }
+const mon = ['01','02', '03', '04', '05','06', '07', '08', '09','10', '11', '12'];
+//const day = ['01','02', '03', '04', '05','06', '07', '08', '09','10', '11', '12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31'];
+let yearArray = [];
+//let yearMonth = [];
+mon.map((value)=>{
+  yearArray.push(`${currentYear}-${value}`);
+})
+console.log('yearArray---',yearArray);
 @connect(state => ({
   chart: state.chart,
 }))
 export default class Powerlist extends Component {
   state = {
-    salesType: 'all',
-    currentTabKey: '',
-    rangePickerValue: getTimeDistance('year'),
+    
   }
 
   componentDidMount() {
     this.props.dispatch({
       type: 'chart/fetch',
     });
+     this.props.dispatch({
+      type: 'chart/get',
+      payload:{time:1},
+    });
   }
 
-  componentWillUnmount() {
+/*  componentWillUnmount() {
     const { dispatch } = this.props;
     dispatch({
       type: 'chart/clear',
     });
-  }
-
-  handleChangeSalesType = (e) => {
-    this.setState({
-      salesType: e.target.value,
-    });
-  }
-
-  handleTabChange = (key) => {
-    this.setState({
-      currentTabKey: key,
-    });
-  }
-
-  handleRangePickerChange = (rangePickerValue) => {
-    this.setState({
-      rangePickerValue,
-    });
-
-    this.props.dispatch({
-      type: 'chart/fetchSalesData',
-    });
-  }
-
-  selectDate = (type) => {
-    this.setState({
-      rangePickerValue: getTimeDistance(type),
-    });
-
-    this.props.dispatch({
-      type: 'chart/fetchSalesData',
-    });
-  }
-
-  isActive(type) {
-    const { rangePickerValue } = this.state;
-    const value = getTimeDistance(type);
-    if (!rangePickerValue[0] || !rangePickerValue[1]) {
-      return;
-    }
-    if (rangePickerValue[0].isSame(value[0], 'day') && rangePickerValue[1].isSame(value[1], 'day')) {
-      return styles.currentDate;
+  }*/
+  //改变选择
+  onChangeTab = (key) => {
+    const {dispatch} = this.props;
+    switch(key){
+      case "1":
+        dispatch({type: 'chart/get',payload:{time:1}});//周
+        break;
+      case "2":
+        dispatch({type: 'chart/get',payload:{time:2}});//月
+        break;
+      case "3":
+        dispatch({type: 'chart/get',payload:{time:3}});//年
+        break;
     }
   }
+
+
 
   render() {
-    const { rangePickerValue, salesType, currentTabKey } = this.state;
-    const { chart } = this.props;
-    const {
-      visitData,
-      visitData2,
-      salesData,
-      searchData,
-      offlineData,
-      offlineChartData,
-      salesTypeData,
-      salesTypeDataOnline,
-      salesTypeDataOffline,
-      loading,
-    } = chart;
 
-    const salesPieData = salesType === 'all' ?
-      salesTypeData
-      :
-      (salesType === 'online' ? salesTypeDataOnline : salesTypeDataOffline);
-
-    const menu = (
-      <Menu>
-        <Menu.Item>操作一</Menu.Item>
-        <Menu.Item>操作二</Menu.Item>
-      </Menu>
-    );
-
-    const iconGroup = (
-      <span className={styles.iconGroup}>
-        <Dropdown overlay={menu} placement="bottomRight">
-          <Icon type="ellipsis" />
-        </Dropdown>
-      </span>
-    );
-
-    const salesExtra = (
-      <div className={styles.salesExtraWrap}>
-        <div className={styles.salesExtra}>
-          <a className={this.isActive('today')} onClick={() => this.selectDate('today')}>
-            今日
-          </a>
-          <a className={this.isActive('week')} onClick={() => this.selectDate('week')}>
-            本周
-          </a>
-          <a className={this.isActive('month')} onClick={() => this.selectDate('month')}>
-            本月
-          </a>
-          <a className={this.isActive('year')} onClick={() => this.selectDate('year')}>
-            全年
-          </a>
-        </div>
-        <RangePicker
-          value={rangePickerValue}
-          onChange={this.handleRangePickerChange}
-          style={{ width: 256 }}
-        />
-      </div>
-    );
-
-   
-
-    const activeKey = currentTabKey || (offlineData[0] && offlineData[0].name);
-    const mapdatas = [{x:'222',y:233}];
-    const CustomTab = ({ data, currentTabKey: currentKey }) => (
-      <Row gutter={8} style={{ width: 138, margin: '8px 0' }}>
-        <Col span={12}>
-          <NumberInfo
-            title={data.name}
-            subTitle="转化率"
-            gap={2}
-            total={`${data.cvr * 100}%`}
-            theme={(currentKey !== data.name) && 'light'}
-          />
-        </Col>
-        <Col span={12} style={{ paddingTop: 36 }}>
-          <Pie
-            animate={false}
-            color={(currentKey !== data.name) && '#BDE4FF'}
-            inner={0.55}
-            tooltip={false}
-            margin={[0, 0, 0, 0]}
-            percent={data.cvr * 100}
-            height={64}
-          />
-        </Col>
-      </Row>
-    );
-
-    const topColResponsiveProps = {
-      xs: 24,
-      sm: 12,
-      md: 12,
-      lg: 12,
-      xl: 6,
-      style: { marginBottom: 24 },
-    };
-    const tableList = {data: {
-      list: [{no:1,description:"1111"}],
-      pagination: { pageNum: 1, total: 0, pageSize: 10 },
-    }};
+    const { count, download ,data} = this.props.chart;
+    const picture = count.picture?count.picture.all:'';
+    const checked = count.picture?count.picture.checked:'';
+    const unchecked = count.picture?count.picture.unchecked:'';
+    const person = count.user?count.user.all:'';
+    const user = count.user?count.user.user:'';
+    const admin = count.user?count.user.admin:'';
+    const down = count.down?count.down:'';
+    const pageAll = count.pageview?count.pageview.all:'';
+    const pageUser = count.pageview?count.pageview.login:'';
+    const pageNotUser = count.pageview?count.pageview.unlogged:'';
+    const list = count.ranking?count.ranking:[];
+    const scale = {'x':{ticks:{}},'y':{}};
+    console.log('data-----',data);
     return (
       <div>
         <Row gutter={24}>
@@ -196,17 +122,16 @@ export default class Powerlist extends Component {
             <ChartCard
               bordered={false}
               title="图片总数"
-              action={<Tooltip title="指标说明"><Icon type="info-circle-o" /></Tooltip>}
-              total={numeral(8846).format('0,0')}
-              footer={<Field label="告警" value={`${numeral(12423).format('0,0')}`} />}
+              action={<Tooltip title="本站拥有的所有图片数"><Icon type="info-circle-o" /></Tooltip>}
+              total={numeral(picture).format('0,0')}
               contentHeight={46}
               footer={
                 <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                   <Trend flag="" style={{ marginRight: 16 }}>
-                    已审核<span className={styles.trendText}>12</span>
+                    已审核<span className={styles.trendText}>{checked}</span>
                   </Trend>
                   <Trend flag="">
-                    审核中<span className={styles.trendText}>11</span>
+                    审核中<span className={styles.trendText}>{unchecked}</span>
                   </Trend>
                 </div>
               }
@@ -220,24 +145,31 @@ export default class Powerlist extends Component {
               bordered={false}
               title="用户总数"
               action={<Tooltip title="指标说明"><Icon type="info-circle-o" /></Tooltip>}
-              total={numeral(8846).format('0,0')}
+              total={numeral(person).format('0,0')}
               footer={
                 <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                   <Trend flag="" style={{ marginRight: 16 }}>
-                    用户<span className={styles.trendText}>12333</span>
+                    用户<span className={styles.trendText}>{user}</span>
                   </Trend>
                   <Trend flag="">
-                    管理员<span className={styles.trendText}>11</span>
+                    管理员<span className={styles.trendText}>{admin}</span>
                   </Trend>
                 </div>
               }
               contentHeight={46}
             >
-              <MiniArea
-                color="#975FE4"
-                height={46}
-                data={visitData}
-              />
+ 
+            </ChartCard>
+          </Col>
+          <Col {...topColResponsiveProps}>
+            <ChartCard
+              bordered={false}
+              title="下载量"
+              action={<Tooltip title="指标说明"><Icon type="info-circle-o" /></Tooltip>}
+              total={numeral(down).format('0,0')}
+              contentHeight={46}
+            >
+
             </ChartCard>
           </Col>
           <Col {...topColResponsiveProps}>
@@ -245,113 +177,81 @@ export default class Powerlist extends Component {
               bordered={false}
               title="浏览量"
               action={<Tooltip title="指标说明"><Icon type="info-circle-o" /></Tooltip>}
-              total={numeral(6560).format('0,0')}
+              total={numeral(pageAll).format('0,0')}
                footer={
                 <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                   <Trend flag="" style={{ marginRight: 16 }}>
-                    用户<span className={styles.trendText}>12</span>
+                    用户<span className={styles.trendText}>{pageUser}</span>
                   </Trend>
                   <Trend flag="">
-                    游客<span className={styles.trendText}>11</span>
+                    游客<span className={styles.trendText}>{pageNotUser}</span>
                   </Trend>
                 </div>
               }
               contentHeight={46}
             >
-              <MiniBar
-                height={46}
-                data={visitData}
-              />
+
             </ChartCard>
           </Col>
-          <Col {...topColResponsiveProps}>
-            <ChartCard
-              bordered={false}
-              title="系统"
-              total=""
-              action={<Tooltip title="指标说明"><Icon type="info-circle-o" /></Tooltip>}
-             
-              footer={
-                <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-                  <Trend flag="" style={{ marginRight: 16 }}>
-                  
-                  </Trend>
-                  <Trend flag="">
-                   
-                  </Trend>
-                </div>
-              }
-              contentHeight={46}
-            >
-              <Row gutter={8} style={{ top: '20px' }}>
-                <Col span={12}>
-                  <Pie
-                    animate={false}
-                    percent={28}
-                    subTitle="CPU"
-                    total="28%"
-                    height={120}
-                    lineWidth={1}
-                  />
-                </Col>
-                <Col span={12}>
-                  <Pie
-                    animate={false}
-                    color="#5DDECF"
-                    percent={22}
-                    subTitle="网络"
-                    total="22%"
-                    height={120}
-                    lineWidth={1}
-                  />
-                </Col>
-               
-              </Row>
-            </ChartCard>
-          </Col>
+
         </Row>
         
-        <Card
-          loading={loading}
-          bordered={false}
-          bodyStyle={{ padding: 0,marginBottom:'26px' }}
-        >
-          <div className={styles.salesCard}>
-            <Tabs tabBarExtraContent={salesExtra} size="large" tabBarStyle={{ marginBottom: 24 }}>
-              <TabPane tab="下载量" key="sales">
-                <Row>
-                  <Col xl={16} lg={12} md={12} sm={24} xs={24}>
-                    <div className={styles.salesBar}>
-                      <Bar
+        <Row>
+          <Col xl={16} lg={12} md={12} sm={24} xs={24}>
+          <div className={styles.block}>
+                <i className={`iconfont icon-pic ${styles.exportImg}`}></i>
+                <div className={styles.cardcontainer}>
+                  <Tabs type="card" onChange={this.onChangeTab}>
+                   <TabPane tab="本周" key="1">{download.length>0?
+                    /*<MonthChart data={data} array={ticksArray}></MonthChart>*/
+                    <Bar
                         height={295}
-                        title="下载量趋势"
-                        data={salesData}
-                      />
-                    </div>
-                  </Col>
-                  <Col xl={8} lg={12} md={12} sm={24} xs={24}>
-                    <div className={styles.salesRank}>
-                      <h4 className={styles.rankingTitle}>下载量排名</h4>
-                      <ul className={styles.rankingList}>
-                        {
-                          rankingListData.map((item, i) => (
-                            <li key={item.title}>
-                              <span className={(i < 3) ? styles.active : ''}>{i + 1}</span>
-                              <span>{item.title}</span>
-                              <span>{numeral(item.total).format('0,0')}</span>
-                            </li>
-                          ))
-                        }
-                      </ul>
-                    </div>
-                  </Col>
-                </Row>
-              </TabPane>
-            </Tabs>
+                        title="本周下载量柱状图"
+                        data={data}
+                        ticks={ticksArray}
+                        mask="YYYY-MM-dd"
+                      />:''}
+                    </TabPane>
+                   <TabPane tab="本月" key="2">{download.length>0?
+                    <MiniArea
+                        height={295}
+                        title="本月下载量趋势图"
+                        data={data}
+                        scale={scale}
+                        timeType='20yy-mm-dd'
+                      />:''}
+                    </TabPane>
+                   <TabPane tab="全年" key="3">{download.length>0?
+                    <Bar
+                        height={295}
+                        title="全年下载量柱状图"
+                        data={data}
+                        ticks={yearArray}
+                        mask="YYYY-MM"
+                      />:''}
+                   </TabPane>
+                  </Tabs>
+                </div>
           </div>
-        </Card>
-
-       
+          </Col>
+          <Col xl={8} lg={12} md={12} sm={24} xs={24}>
+            <div className={styles.rank}>
+              <h4 className={styles.rankingTitle}>下载量排名</h4>
+              <ul className={styles.rankingList}>
+                {
+                  list.map((item, i) => (
+                    <li key={item._id}>
+                      <span className={(i < 3) ? styles.active : ''}>{i + 1}</span>
+                      <span onClick={this.showPicture}>{item.title}</span>
+                      <span style={{color:'#f56a00',fontWeight:'bold',marginLeft:"20px"}}>{item.download_count}</span>
+                      <span><Avatar size="small" className={styles.avatar} src={config.CHRCK_FILE+item.author.avatar} />{item.author.name}</span>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          </Col>
+        </Row>
       </div>
     );
   }

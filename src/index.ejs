@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>禾迈</title>
+  <title>Colorful</title>
   <link rel="icon" href="./favicon.png" type="image/x-icon">
   <link rel="stylesheet" type="text/css" href="../iconfont/iconfont.css"/>
 
@@ -28,6 +28,23 @@
  if(!language){
    language = "zh-cn";
  }
+ var PV = getLocalStorage("PV");
+ var userType = getLocalStorage("userType");
+ if(!PV){
+    localStorage[PV] = 1;
+ }
+ else{
+    localStorage[PV] += 1;
+ }
+ var Token = getLocalStorage("Token");
+ if(userType != "2"){
+   if(Token){
+      document.write('\<script src="http:\/\/localhost:3000\/pageView?user=true" type="text/javascript" charset="utf-8" async defer><\/script>')
+   }
+   else{
+    document.write('\<script src="http:\/\/localhost:3000\/pageView?user=false" type="text/javascript" charset="utf-8" async defer><\/script>')
+   }
+}
  localStorage["country"] = JSON.stringify(remote_ip_info.country);
  console.log("remote_ip_info.country:",remote_ip_info.country);
 if(remote_ip_info.country ==="中国"){

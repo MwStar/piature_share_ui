@@ -1,5 +1,6 @@
-import { fakeRegister } from '../services/api';
-
+import { userRegister } from '../services/user';
+import {message} from 'antd';
+import {routerRedux} from 'dva/router';
 export default {
   namespace: 'register',
 
@@ -8,20 +9,29 @@ export default {
   },
 
   effects: {
-    *submit(_, { call, put }) {
+    *submit({payload}, { call, put }) {
       yield put({
         type: 'changeSubmitting',
         payload: true,
       });
-      const response = yield call(fakeRegister);
+      console.log("payload--",payload);
+      const response = yield call(userRegister,payload);
+      if(response.status === 0){
+        yield put({
+          type: 'registerHandle',
+          payload: response,
+        });
+        message.success(response.message);
+        yield put(routerRedux.push({ pathname: '/user/login' }));          
+      }
+
+       else{
+          message.error(response.message);
+        }
       yield put({
-        type: 'registerHandle',
-        payload: response,
-      });
-      yield put({
-        type: 'changeSubmitting',
-        payload: false,
-      });
+          type: 'changeSubmitting',
+          payload: false,
+        });
     },
   },
 

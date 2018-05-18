@@ -8,7 +8,7 @@ import logo from '../assets/logo.svg';
 import { getRoutes } from '../utils/utils';
 
 
-const copyright = <div>Copyright <Icon type="copyright" /> 2017 杭州禾迈电力电子科技有限公司</div>;
+const copyright = <div>Copyright <Icon type="copyright" /> 2018 Colorful</div>;
 
 class UserLayout extends React.PureComponent {
   getPageTitle() {
@@ -29,7 +29,7 @@ class UserLayout extends React.PureComponent {
             <div className={styles.header}>
               <Link to="/">
                 <img alt="logo" className={styles.logo} src={logo} />
-                <span className={styles.title}>Hoymiles 禾迈</span>
+                <span className={styles.title}>Colorful</span>
               </Link>
             </div>
            

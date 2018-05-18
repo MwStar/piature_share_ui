@@ -1,12 +1,14 @@
-import { query as queryUsers, queryCurrent } from '../services/user';
+import { userInfo , getUserById} from '../services/user';
 import {setLocalStorage, getLocalStorage} from '../utils/utils';
+import {message} from 'antd';
 export default {
   namespace: 'user',
 
   state: {
     list: [],
     loading: false,
-    currentUser: {},
+    currentUser: {},//当前用户
+    user: {},//用户
   },
 
   effects: {
@@ -26,8 +28,8 @@ export default {
       });
     },
     *fetchCurrent(_, { call, put }) {
-      const response = yield call(queryCurrent);
-      if(response.status==="0"){
+      const response = yield call(userInfo);
+      if(response.status===0){
         setLocalStorage("userinfo", response.data || {});
         yield put({
           type: 'saveCurrentUser',
@@ -35,6 +37,16 @@ export default {
         });
       }
     },
+    *getUserById({payload}, { call, put }) {
+      const response = yield call(getUserById,payload);
+      if(response.status===0){
+        yield put({
+          type: 'saveUser',
+          payload: response.data,
+        });
+      }
+    },
+    
   },
 
   reducers: {
@@ -54,6 +66,12 @@ export default {
       return {
         ...state,
         currentUser: action.payload,
+      };
+    },
+    saveUser(state, action) {
+      return {
+        ...state,
+        user: action.payload,
       };
     },
     changeNotifyCount(state, action) {

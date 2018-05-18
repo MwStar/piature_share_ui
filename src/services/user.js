@@ -12,6 +12,14 @@ export async function userLogin(params) {
 //     body: params,
 //   });
 // }
+//注册
+export async function userRegister(params) {
+  return request('/user/signup', {
+    method: 'POST',
+    body: params,
+  });
+}
+
 export async function queryCurrent(params) {
   return request('/permission/api/0/permission/user/getMe', {
     method: 'POST',
@@ -26,32 +34,56 @@ export async function getBackPassword(params) {
   });
 }
 
-//获取验证码
-export async function getValidateCode(params) {
-  return request('/permission/system/0/admin/getValidateCode', {
+
+//修改密码
+export async function rePassword(params) {
+  return request('/pass_setting', {
     method: 'POST',
     body: params,
   });
 }
 
-//获取用户信息包含公司信息
+
+//获取用户信息(自己)
 export async function userInfo(params) {
-  return request('/permission/api/0/permission/user/getCurrentUserInfo', {
-    method: 'POST',
-    body: params,
+  return request('/userInfo', {
+    method: 'GET',
+  });
+}
+
+//获取用户信息（别人）
+export async function getUserById(params) {
+  return request('/userInfo', {
+    method: 'GET',
+    param:params.id,
   });
 }
 //修改用户信息
 export async function setting(params) {
-  return request('/permission/api/0/permission/user/verifyOldPasswdAndUpdateNewPasswd', {
+  return request('/setting', {
     method: 'POST',
     body: params,
   });
 }
 
-//获取用户对应菜单
-export async function queryResource(params) {
-  return request('/permission/api/0/permission/userInfo/queryResourceByUserId', {
+//获取消息
+export async function queryNotices(params) {
+  return request('/message', {
+    method: 'GET',
+  });
+}
+
+//某条消息已读
+export async function readNotices(params) {
+  return request('/message_hasread', {
+    method: 'GET',
+    param:params.id,
+  });
+}
+
+//清空所有消息
+export async function clearAllNotices(params) {
+  return request('/allmessage_hasread', {
     method: 'POST',
     body: params,
   });

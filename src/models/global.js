@@ -1,4 +1,6 @@
-import { queryNotices } from '../services/api';
+import { queryNotices , readNotices, clearAllNotices} from '../services/user';
+import { routerRedux } from 'dva/router';
+import {message} from 'antd';
 export default {
   namespace: 'global',
 
@@ -14,26 +16,46 @@ export default {
         type: 'changeNoticeLoading',
         payload: true,
       });
-      const data = yield call(queryNotices);
+      const response = yield call(queryNotices);
       yield put({
         type: 'saveNotices',
-        payload: data,
+        payload: response.data.messages_unread,
       });
-      yield put({
+      /*yield put({
         type: 'user/changeNotifyCount',
         payload: data.length,
-      });
+      });*/
     },
-    *clearNotices({ payload }, { put, select }) {
+    //已读消息--一条
+    *clearOneNotices({ payload }, { call, put, select }) {
+      const response = yield call(readNotices,payload);
+      if(response.status === 0){
+        yield put({
+          type: 'fetchNotices',
+        });
+      }
+      else{
+        message.error(response.message);
+      }
+      /*const count = yield select(state => state.global.notices.length);
+      yield put({
+        type: 'user/changeNotifyCount',
+        payload: count,
+      });*/
+    },
+    //清空消息-----将所有消息设置为已读
+    *clearNotices({ payload }, { call, put, select }) {
+      const notices = yield select(state => state.global.notices);
+      const data = yield call(clearAllNotices,{message:notices});
       yield put({
         type: 'saveClearedNotices',
         payload,
       });
-      const count = yield select(state => state.global.notices.length);
-      yield put({
+      //onst count = yield select(state => state.global.notices.length);
+      /*yield put({
         type: 'user/changeNotifyCount',
         payload: count,
-      });
+      });*/
     },
   },
 
@@ -54,7 +76,7 @@ export default {
     saveClearedNotices(state, { payload }) {
       return {
         ...state,
-        notices: state.notices.filter(item => item.type !== payload),
+        notices: [],
       };
     },
     changeNoticeLoading(state, { payload }) {

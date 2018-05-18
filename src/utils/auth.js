@@ -9,7 +9,7 @@ export function getAuthHeader(sso_token) {
   }
 
   let headers = {};
- // headers["authorization"] = sso_token;
+  headers["authorization"] = sso_token;
   headers['Accept'] = 'application/json';
   headers['Content-Type'] = 'application/json;charset=utf-8';
   //headers['language'] = language;

@@ -1,10 +1,11 @@
 /**
- *  desc: 新增固件包
+ *  desc: 修改密码
  * author: ll
  */
  import React, { Component } from 'react';
  import { Input,Row,Col, Icon, message,Button,Card,Modal,Form} from 'antd';
  import {connect} from 'dva';
+ const forge = require('node-forge');
  import styles from './index.less'
 const FormItem = Form.Item;
 const formItemLayout = {
@@ -19,8 +20,8 @@ const formItemLayout = {
 };
 /**
  *
- 类说明：电站详情
- @class 类名 StationDetails
+ 类说明：修改密码
+ @class 类名 PasswordForm
  @constructor
  */
  @connect(state => ({
@@ -53,9 +54,10 @@ const formItemLayout = {
     }
   }
 
-  handleChange = () => {
-    //获取form值  
+  //保存修改的密码
+  handlePasswordOk = () => {
     const { form } = this.props;
+    const { dispatch } = this.props;
     form.validateFields((err, fieldsValue) => {
       if (err) return;
 
@@ -69,8 +71,17 @@ const formItemLayout = {
           message.error('两次密码输入不一致!');
           return false;
         }
-        //传给父组件
-        this.props.handlePassword(values);
+        /*//传给父组件
+        if(values.newPasswd!=undefined){
+            //MD5加密
+            let md = forge.md.md5.create();
+            md.update(values.newPasswd);
+            let md1 = forge.md.md5.create();
+            md1.update(values.oldPasswd);
+            values.newPasswd = md.digest().toHex();
+            values.oldPasswd = md1.digest().toHex();
+          }*/
+          dispatch({type:'setting/settingPass',payload:values});
     });
   }
 
@@ -78,12 +89,18 @@ const formItemLayout = {
     const { getFieldDecorator } = this.props.form;
     const {visible} = this.props.setting;
     return (
-                <Form onSubmit={(e)=>{e.stopPropagation();this.handleSearch();}}>
+                <div>
+                <Row>
+                  <Col span={2} push={22}>
+                    <Button type='primary' onClick ={this.handlePasswordOk}>保存</Button>
+                  </Col>
+                </Row>
+                <Form onSubmit={(e)=>{e.stopPropagation();this.handlePasswordOk();}}>
                   <Row>
                     <Col span={24}>
                       <FormItem {...formItemLayout} label="原密码">
                         {getFieldDecorator('oldPasswd', {
-                        	rules: [{ required: true, message: '请输入原密码' }],
+                          rules: [{ required: true, message: '请输入原密码' }],
                         })(
                           <Input type="password" placeholder ="请输入原密码"/>
                             )}
@@ -91,40 +108,41 @@ const formItemLayout = {
                     </Col>
 
                     <Col span={24}>
-	                  <FormItem {...formItemLayout} label="新密码">
-		                {getFieldDecorator('newPasswd', {
-		                  rules: [
+                    <FormItem {...formItemLayout} label="新密码">
+                    {getFieldDecorator('newPasswd', {
+                      rules: [
                         { required: true, message: '请输入新密码' },
                         {min:6, message:'最小长度为6'},
                         {max:20, message:'最大长度为20'},
                       ],
-		                })(
-		                      <Input 
-		                      	type="password" 
-			                      placeholder ="请输入新密码" 
-			                      maxLength="20"
-		                      />
-		                    )}
-	                  </FormItem>
-	                </Col>
+                    })(
+                          <Input 
+                            type="password" 
+                            placeholder ="请输入新密码" 
+                            maxLength="20"
+                          />
+                        )}
+                    </FormItem>
+                  </Col>
 
-	                <Col span={24}>
-	                  <FormItem {...formItemLayout} label="确认密码">
-	                    {getFieldDecorator('confirm', {
-	                      rules: [
+                  <Col span={24}>
+                    <FormItem {...formItemLayout} label="确认密码">
+                      {getFieldDecorator('confirm', {
+                        rules: [
                               { required: true, message: '请再次输入密码' },
                               {min:6, message:'最小长度为6'},
                               {max:20, message:'最大长度为20'},
                               {validator: this.checkPassword},
                            ],
-	                      })(
-	                      <Input type="password" maxLength="20" placeholder="确认密码" onBlur={this.handleChange}/>
-	                    )}
-	                  </FormItem>
-	                </Col>
+                        })(
+                        <Input type="password" maxLength="20" placeholder="确认密码" onBlur={this.handleChange}/>
+                      )}
+                    </FormItem>
+                  </Col>
 
                   </Row>
-                </Form>      		
+                </Form>
+              </div>          
     );
   }
 }

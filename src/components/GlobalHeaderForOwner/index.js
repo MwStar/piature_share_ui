@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Layout, Menu, Icon, Spin, Tag, Dropdown, /*Avatar*/ message ,Breadcrumb,Row,Col} from 'antd';
+import { Layout, Menu, Icon, Spin, Tag, Dropdown, Avatar , message ,Breadcrumb,Row,Col} from 'antd';
 import moment from 'moment';
 import groupBy from 'lodash/groupBy';
 import Debounce from 'lodash-decorators/debounce';
@@ -12,8 +12,10 @@ import UserPassword from '../../components/ModifiPassword/index';
 import logo from '../../assets/logo.svg';
 import { getMenuData } from '../../common/menuOwner';
 import {getLocalStorage,setLocalStorage } from '../../utils/utils';
+import {config} from '../../utils/config';
+import defaultAvatar from '../../assets/avatarDefault.png';
 
-//const menuData = getLocalStorage("menulist");
+const token = getLocalStorage("Token");
 const menuData = getMenuData();
 
 const { Header } = Layout;
@@ -27,9 +29,94 @@ export default class GlobalHeader extends PureComponent {
       language:this.language,
     }
   }
-  componentDidMount() {
+  /*componentDidMount() {
     this.props.dispatch({
       type: 'user/fetchCurrent',
+    });
+  }*/
+  //获取消息
+  getNoticeData() {
+    const { notices ,currentUser } = this.props;
+    if (notices.length === 0) {
+      return {};
+    }
+    const newNotices = notices.map(notice => {
+      const newNotice = { };
+      if (notice.create_at) {
+        newNotice.create_at = moment(notice.create_at).fromNow();
+      }
+      // transform id to item key
+      if (notice._id) {
+        newNotice.key = notice._id;
+      }
+      if(notice.type === '1'){
+        newNotice.title = notice.master.name+"评论了你的"+"'"+notice.img.title+"'"+"图片";
+        newNotice.imgId = notice.img._id;
+        newNotice.description = notice.reply.content;
+      }
+      else if(notice.type === '1'){
+        newNotice.title = notice.master.name+"在图片"+notice.img.title+"回复了你";
+        newNotice.imgId = notice.img._id;
+        newNotice.description = notice.reply.content;
+      }
+      else{
+        newNotice.title = notice.master.name+"关注了你";
+      }
+      if(notice.master.avatar){newNotice.avatar = notice.master.avatar;}
+      else{newNotice.avatar = defaultAvatar;}
+
+      newNotice.master = notice.master;
+      newNotice.level = notice.type;
+      newNotice.type = '消息';
+      /*if (newNotice.extra && newNotice.status) {
+        const color = {
+          todo: '',
+          processing: 'blue',
+          urgent: 'red',
+          doing: 'gold',
+        }[newNotice.status];
+        newNotice.extra = (
+          <Tag color={color} style={{ marginRight: 0 }}>
+            {newNotice.extra}
+          </Tag>
+        );
+      }*/
+      return newNotice;
+    });
+    return groupBy(newNotices, 'type');
+  }
+  //清空消息
+  handleNoticeClear = (type) => {
+    message.success(`清空了${type}`);
+    this.props.dispatch({
+      type: 'global/clearNotices',
+      payload: type,
+    });
+  }
+  //
+  handleNoticeVisibleChange = (visible) => {
+    if (visible) {
+      this.props.dispatch({
+        type: 'global/fetchNotices',
+      });
+    }
+  }
+
+  ItemClick = (item, tabProps) => {
+    console.log(item, tabProps);
+    const {dispatch} = this.props;
+    if(item.level === '1'|| item.level === '2'){
+      dispatch({type:'pictures/viewPicture',payload:{id:item.imgId}})
+      .then(()=>{    
+      dispatch({type:'pictures/modalStatus',modal:true});
+      })
+    }
+    else{
+      dispatch(routerRedux.push('/owner/user/'+item.master._id));
+    }
+    this.props.dispatch({
+      type: 'global/clearOneNotices',
+      payload: {id:item.key},
     });
   }
 
@@ -38,12 +125,11 @@ export default class GlobalHeader extends PureComponent {
     switch(key){
       //个人中心
       case "userInfo":
-        dispatch(routerRedux.push({ pathname: '/owner/setting' }));
+        dispatch(routerRedux.push({ pathname: '/owner/paintings' }));
         break;
-        //修改密码
+        //设置
       case "Password":
-        dispatch({type:'setting/setKey',key:2});
-        dispatch({type:'setting/isVisible',visible:true});
+        dispatch(routerRedux.push({ pathname: '/owner/setting' }));
         break;
         //登出
       case "logout":
@@ -108,20 +194,36 @@ export default class GlobalHeader extends PureComponent {
       window.location.reload()
   };
 
+  menuClick = (e) => {
+    if(e.key === '/owner/paintings' && !token){
+      message.info('请先登录！');
+    }
+  }
+
+  /*disabled = (path) => {
+    if(path === '/owner/paintings' && !token){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }*/
+
   render() {
     const {language} = this.state;
-    const {currentUser, fetchingNotices,} = this.props;
+    const {currentUser, fetchingNotices,notices} = this.props;
     const { pathname } = this.props.location;
 //    const pathname = hash?hash.match(/\/[a-zA-Z]+\/[a-zA-Z]+/);
     const menu = (
       <Menu className={styles.menu} selectedKeys={[]} onClick={this.handleMenuClick}>
         <Menu.Item key="userInfo"><Icon type="user" />个人中心</Menu.Item>
-        <Menu.Item key="Password"><Icon type="lock" />修改密码</Menu.Item>
+        <Menu.Item key="Password"><Icon type="lock" />设置</Menu.Item>
         <Menu.Divider />
         <Menu.Item key="logout"><Icon type="logout" />退出登录</Menu.Item>
       </Menu>
     );
     const menus = this.props.menuList.length>0?this.props.menuList:menuData;
+    const noticeData = this.getNoticeData();
     //const menus = getMenuData();
     return (
       <Header className={styles.header}>
@@ -129,36 +231,56 @@ export default class GlobalHeader extends PureComponent {
           <Row>
             <Col span={2}>
               <span className={styles.logo}>
-                <Link to="/">
+                <a href="/owner/view">
                   <img src={logo} alt="logo" />
-                </Link>
+                </a>
+                {/*<span className={styles.logoname}>Colorful</span>*/}
               </span>
             </Col>
             <Col span={8} offset={2}>
             	<Menu
     		        mode="horizontal"
+                onClick={this.menuClick}
     		        selectedKeys={this.getSelectedMenuKeys(pathname)}
     		        style={{ lineHeight: '64px' }}
     		      >
     		      	{menus.map((item)=>{
-                  return (<Menu.Item key={item.key || item.path}>
+                  return (
+                    <Menu.Item key={item.key || item.path} /*disabled={this.disabled(item.path)}*/>
                             <a href={`#${item.path}`}>
                                 <span>{item.name}</span>
                             </a>
-                          </Menu.Item>)
+                    </Menu.Item>
+                          )
                 })}
     		     </Menu>
             </Col>
             <Col span={12}>
               <span className={styles.right}>
-                {currentUser.userFullName ? (
+                {currentUser.name?<NoticeIcon
+                  className={styles.action}
+                  count={notices.length}
+                  onItemClick={this.ItemClick}
+                  onClear={this.handleNoticeClear}
+                  onPopupVisibleChange={this.handleNoticeVisibleChange}
+                  loading={fetchingNotices}
+                  popupAlign={{ offset: [20, -16] }}
+                >
+                  <NoticeIcon.Tab
+                    list={noticeData['消息']}
+                    title="消息"
+                    emptyText="你已查看所有通知"
+                    emptyImage="https://gw.alipayobjects.com/zos/rmsportal/wAhyIChODzsoKIOBHcBk.svg"
+                  />
+                </NoticeIcon>:''}
+                {currentUser.name ? (
                   <Dropdown overlay={menu}>
                     <span className={`${styles.action} ${styles.account}`}>
-                      {/* <Avatar size="small" className={styles.avatar} src={currentUser.avatar} /> */}
-                      {currentUser.userFullName}
+                      <Avatar size="small" className={styles.avatar} src={currentUser.avatar?config.CHRCK_FILE+currentUser.avatar:defaultAvatar} />
+                      {currentUser.name}
                     </span>
                   </Dropdown>
-                ) : <Spin size="small" style={{ marginLeft: 8 }} />}
+                ) : <span><a href="#/user/register" style={{marginRight:"10px"}}>注册</a><a href="#/user/login">登录</a></span>}
                 {/*<span className={styles.language}>
                     {(language==="en-us")?<a onClick={()=>{this.handleLanguage("zh-cn")}}>中文</a>
                     :<a onClick={()=>{this.handleLanguage("en-us")}}>English</a>}

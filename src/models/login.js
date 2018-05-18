@@ -23,11 +23,10 @@ export default {
       console.log(response);
       if(response.status=== 0){
         //把登录信息存入localStorage
-        /*setLocalStorage("gfToken", response.data.token);
-        let userInfo = getLocalStorage("userInfo");
-        let t = getLocalStorage("gfToken"); */       
-        if(response.data.userType === "2"){
-          debugger
+        setLocalStorage("Token", response.data.token);
+        setLocalStorage("userType", response.data.userType);
+        //let userInfo = getLocalStorage("userInfo");      
+        if(response.data.userType === "1"){//1用户，2管理员
           //yield put({ type: 'queryOwnerResource' });
           yield put({type: 'saveOwner',owner: true,});
           yield put(routerRedux.push('/owner/view'));
@@ -57,7 +56,14 @@ export default {
             status: false,
           },
         });
-        yield put(routerRedux.push('/user/login'));
+        localStorage.removeItem("Token");
+        localStorage.removeItem("userType");
+        localStorage.removeItem("userinfo");
+        yield put({
+          type: 'user/saveCurrentUser',
+          payload: {},
+        });
+        yield put(routerRedux.push('/owner/view'));
       },
       //获取管理菜单资源
       *queryResource({param},{call,put}){    

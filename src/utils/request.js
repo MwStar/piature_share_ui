@@ -26,8 +26,13 @@ function checkStatus(response) {
  */
 export default function request(url, options,type) {
   if(!type){
-     url = config.API_SERVER + url;
-  }
+    if(options.method === 'POST' || !options.param){
+        url = config.API_SERVER + url;  
+      }
+      else{
+        url = config.API_SERVER + url + "?" + "id=" + options.param;
+      }
+    }
  
   const authHeader = getAuthHeader(authenticated());
   const defaultOptions = {
@@ -40,6 +45,12 @@ export default function request(url, options,type) {
     };
     newOptions.body = JSON.stringify(newOptions.body);
   }
+  else{//GET没有body
+    newOptions.headers = {
+      ...newOptions.headers,
+    };
+  }
+
 
   return fetch(url, newOptions)
     .then(checkStatus)

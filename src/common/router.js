@@ -41,43 +41,27 @@ export const getRouterData = (app) => {
       name:"统计",
     },
     '/picture/verify': {
-        component: dynamicWrapper(app, ['station'], () => import('../routes/Station/Powerlist')),
+        component: dynamicWrapper(app, ['manage'], () => import('../routes/Picture/Check')),
       name:"图片审核",
     },
+    '/picture/tag': {
+        component: dynamicWrapper(app, ['tag'], () => import('../routes/Picture/Tag')),
+      name:"图片标签",
+    },
     '/picture/manage': {
-        component: dynamicWrapper(app, ['station'], () => import('../routes/Station/Powerlist')),
+        component: dynamicWrapper(app, ['manage'], () => import('../routes/Picture/Manage')),
       name:"图片管理",
     },
-    /*'/station/quicksite/:id': {
-      component: dynamicWrapper(app, ['quicksite'], () => import('../routes/Station/QuickSite')),
+    '/picture/edit/:id': {
+        component: dynamicWrapper(app, ['paintingsuser'], () => import('../components/Upload/UploadModal')),
+      name:"图片信息修改",
     },
-    '/station/quicksite/:id/device': {
-      component: dynamicWrapper(app, ['quicksite'], () => import('../routes/Station/QuickSite/Step2')),
+    '/picture/add': {
+        component: dynamicWrapper(app, ['paintingsuser'], () => import('../components/Upload/UploadModal')),
+      name:"上传图片",
     },
-    '/station/quicksite/:id/diagram/': {
-      component: dynamicWrapper(app, ['quicksite'], () => import('../routes/Station/QuickSite/Step3')),
-    },
-    '/station/qucikResult/:id': {
-      component: dynamicWrapper(app, ['quicksite'], () => import('../routes/Station/QuickSite/Result')),
-    },
-    '/station/profession/:id': {
-      component: dynamicWrapper(app, ['quicksite'], () => import('../routes/Station/ProfessionSite')),
-    },
-    '/station/profession/:id/device': {
-      component: dynamicWrapper(app, ['quicksite'], () => import('../routes/Station/ProfessionSite')),
-    },
-    '/station/profession/:id/layout': {
-      component: dynamicWrapper(app, ['quicksite'], () => import('../routes/Station/ProfessionSite')),
-    },
-    '/station/profession/:id/upload': {
-      component: dynamicWrapper(app, ['quicksite'], () => import('../routes/Station/ProfessionSite')),
-    },
-    '/station/view/:id&:name': {
-      component: dynamicWrapper(app, ['view'], () => import('../routes/Station/StationDetails')),
-    },
-    '/station/editInfo/:id': {
-      component: dynamicWrapper(app, ['quicksite'], () => import('../routes/Station/EditInfo')),
-    },*/
+   
+
     
     '/setting': {
       component: dynamicWrapper(app, ['setting'], () => import('../routes/User/UserInfo')),
@@ -114,49 +98,54 @@ export const getRouterData = (app) => {
     '/exception/500': {
       component: dynamicWrapper(app, [], () => import('../routes/Exception/500')),
     },
+    
 
     '/owner': {
-        component: dynamicWrapper(app, ['user', 'login','setting'], () => import('../layouts/OwnerLayout')),
+        component: dynamicWrapper(app, ['user', 'login','setting','paintingsuser','collectuser','focususer'], () => import('../layouts/OwnerLayout')),
       },
       //首页
     '/owner/view': {
-      component: dynamicWrapper(app, ['view'], () => import('../routes/Owner/index')),
-    },
-    //首页--某张图详情
-    '/owner/view/:id': {
-      component: dynamicWrapper(app, ['view'], () => import('../routes/Owner/index')),
+      component: dynamicWrapper(app, ['pictures','allpicture','paintingsuser'], () => import('../routes/Owner/index')),
     },
     //发现
     '/owner/discover': {
-      component: dynamicWrapper(app, ['view'], () => import('../routes/Owner/index')),
+      component: dynamicWrapper(app, ['pictures','paintings'], () => import('../routes/Owner/Discover')),
     },
     //发现----某画集详情
-    '/owner/discover/:id': {
-      component: dynamicWrapper(app, ['view'], () => import('../routes/Owner/index')),
+    '/owner/discover_p/:id': {
+      component: dynamicWrapper(app, ['pictures','paintings'], () => import('../routes/Owner/PictureDiscover')),
+    },
+    //搜索
+    '/owner/search/:name': {
+      component: dynamicWrapper(app, ['pictures','search'], () => import('../routes/Owner/Search')),
     },
     //最新
     '/owner/new': {
-      component: dynamicWrapper(app, ['view'], () => import('../routes/Owner/index')),
+      component: dynamicWrapper(app, ['pictures','new'], () => import('../routes/Owner/New')),
     },
-    //画集
+    //别人用户---个人中心
+    '/owner/user/:id': {
+      component: dynamicWrapper(app, ['paintingsuser','pictures','pictureuser','collectuser','focususer'], () => import('../routes/Owner/User')),
+    },
+    //用户---个人中心
     '/owner/paintings': {
-      component: dynamicWrapper(app, ['paintings'], () => import('../routes/Owner/User')),
+      component: dynamicWrapper(app, ['paintingsuser','pictures','pictureuser','collectuser','focususer'], () => import('../routes/Owner/User')),
     },
-    //用户--某个画集
+    //用户---某个画集
     '/owner/painting/:id': {
-      component: dynamicWrapper(app, ['paintings'], () => import('../routes/Owner/Pictures')),
-    },
-    //用户---收藏
-    '/owner/collect': {
-      component: dynamicWrapper(app, ['paintings'], () => import('../routes/Owner/User')),
-    },
-    //用户---关注
-    '/owner/focus': {
-      component: dynamicWrapper(app, ['paintings'], () => import('../routes/Owner/User')),
+      component: dynamicWrapper(app, ['paintingsuser','pictures'], () => import('../routes/Owner/Pictures')),
     },
     //用户----设置资料
     '/owner/setting': {
-      component: dynamicWrapper(app, ['paintings'], () => import('../routes/Owner/User')),
+      component: dynamicWrapper(app, ['setting','user'], () => import('../routes/Owner/Setting')),
+    },
+    //用户----上传图片
+    '/owner/upload': {
+      component: dynamicWrapper(app, ['paintingsuser','user'], () => import('../components/Upload/UploadModal')),
+    },
+    //用户----修改图片信息
+    '/owner/pictureEdit/:paintingsId/:id': {
+      component: dynamicWrapper(app, ['paintingsuser'], () => import('../components/Upload/UploadModal')),
     },
     
     
